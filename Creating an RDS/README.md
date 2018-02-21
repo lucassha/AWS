@@ -16,7 +16,7 @@ Then choose an identifier, username and password.
 
 You'll have a few more options to choose from in the next page, but everything can be kept to default. Create your DB instance.
 
-** Step 3**
+**Step 3**
 
 We need to add an inbound rule to the VPC Security Group created during the RDS instance.
 
