@@ -11,7 +11,7 @@ Type in `lsblk` to make sure your EBS volume(s) has been created
 
 `sudo mkdir /mnt/ebs-store`
 
-**Mount your volume in `ebs-store`:**
+**Mount your volume in** `ebs-store`**:**
 
 `sudo mount /dev/xvdf /mnt/ebs-store`
 
