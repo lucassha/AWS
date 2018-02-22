@@ -102,7 +102,10 @@ sudo /bin/sh -c 'echo "extension=amazon-elasticache-cluster-client.so" >> /etc/p
 ### Step 6
 
 1) Download this demo client script `wget http://bit.ly/1vf3vQx -O elasticache-client.php`
-
+2) Go to your ca-cache cluster and get the endpoint: `ca-cache.nt430g.cfg.usw2.cache.amazonaws.com:11211`
+3) Type in: `php elasticache-client.php --endpoint=ca-cache.nt430g.cfg.usw2.cache.amazonaws.com:11211`
+4) You'll see some output about connecting to the 2 nodes you created. 
+5) You succeeded, now delete the cache by selecting delete in the memcached screen on the elasticache dashboard
 
 
 
