@@ -1,5 +1,7 @@
 ### Create an elasticache cluster
 
+# (This tutorial was created by following along from Cloud Academy)
+
 <hr>
 
 ### Step 1: Create a cache subnet group
