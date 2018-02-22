@@ -23,7 +23,7 @@ You can choose from Memcached or Redis protocol-compliant cache engine software,
 
 <hr>
 
-### Step2: Create a new Elasticache cluster powered by Memcached
+### Step 2: Create a new Elasticache cluster powered by Memcached
 
 1) Go to the ElastiCache Dashboard and click `get started now`
 2) Select `Memcached`
@@ -34,7 +34,7 @@ You can choose from Memcached or Redis protocol-compliant cache engine software,
 
 <hr>
 
-### Step3: Launch an EC2 instance
+### Step 3: Launch an EC2 instance
 
 Go to EC2 and just pick the free tier micro AMI.
 
