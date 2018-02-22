@@ -30,10 +30,10 @@ Once you're there, you should see the RDS that you named. For instance, my Group
 Click on `inbound rules` on the bottom and let's have a look. Type in the following, and you're good to go:
 
 ```
-**Type**: MYSQL
-**Protocol**: TCP
-**Port**: 3306
-**Source**: 172.31.0.0/16
+Type: MYSQL
+Protocol: TCP
+Port: 3306
+Source: 172.31.0.0/16
 ```
 
 Now, let's launch an EC2 instance. Just choose the basic Linux 64 bit AMI and keep reviewing until you hit `Configure Instance Details`.
