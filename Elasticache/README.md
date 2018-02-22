@@ -85,7 +85,7 @@ scp -i YOUR-KEY.pem AmazonElastiCacheClusterClient-X.Y.Z-PHP53-64bit.tgz(the thi
 ```
 
 ```
-scp -i /Users/shannonlucas/Documents/linux/elasticacheKey.pem /Users/shannonlucas/Downloads/AmazonElastiCacheClusterClient-1.0.1-PHP53-32bit.tgz ec2-user@54.213.58.32:/home/ec2-user 
+scp -i /Users/shannonlucas/Documents/linux/elasticacheKey.pem /Users/shannonlucas/Downloads/AmazonElastiCacheClusterClient-1.0.1-PHP53-64bit.tgz ec2-user@54.213.58.32:/home/ec2-user 
 ```
 
 11) Install the package: `sudo pecl install /home/ec2-user/AmazonElastiCacheClusterClient-X.Y.Z-PHP53-64bit.tgz` 
