@@ -19,7 +19,7 @@
 
 **Lightsail** - a virtual private server (VPS) backed by AWS infrastructure. Designing to be simple, easy, and quick to use. Used to host simple websites and blogs usually. 
 
-**Amazon Machine Images** - basically an autoconfigured EC2 instance
+**Amazon Machine Images (AMI)** - basically an autoconfigured EC2 instance
 
 
 <hr>
@@ -29,3 +29,5 @@
 **Simple Storage Service (S3)** - organizes content in buckets. You can store video files, backups, mp3s, html, css, js, ANYTHING. The size can range from 0 bytes to 5 TBs. 
 
 **Identity and Access Mgmt (IAM)** - allows you to restrict permissions to specific buckets (list, upload/delete, view permissions)
+
+**RDS** - relational database that offers most standard services (MySQL, PostgreSQL, etc.). It basically takes away the administrative services associated with a database. 
