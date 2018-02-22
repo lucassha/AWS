@@ -1,6 +1,6 @@
 ### Create an elasticache cluster
 
-# (This tutorial was created by following along from Cloud Academy)
+##### (This tutorial was created by following along from Cloud Academy)
 
 <hr>
 
