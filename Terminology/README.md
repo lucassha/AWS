@@ -31,3 +31,7 @@
 **Identity and Access Mgmt (IAM)** - allows you to restrict permissions to specific buckets (list, upload/delete, view permissions)
 
 **RDS** - relational database that offers most standard services (MySQL, PostgreSQL, etc.). It basically takes away the administrative services associated with a database. 
+
+**Recovery Point Objective (RPO)** - the acceptable amount of data loss measured in time
+
+**Recovery Time Objective (RTO)** - the time it takes after a disruption to restore a business process to its service level as was defined by the operational level agreement
