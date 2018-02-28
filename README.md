@@ -1,2 +1,2 @@
 # AWS
-AWS SysOps notes, musings, etc. . .
+AWS SysOps notes 
