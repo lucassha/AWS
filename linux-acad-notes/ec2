@@ -1,0 +1,139 @@
+ec2
+elastic cloud compute
+
+essentials
+	scalable virtual servers in the cloud
+	known as an instance and can be made up of different types and sizes
+	most commonly run diff flavors of linux or windows
+
+instance config is composed of:
+	AMI: the os 
+	instance type: the hardware
+	network interface: public, private, or elastic IP addr
+	storage: the instance 'harddrive'--
+		elastic block store (ebs) - network persistent storage
+		instance store - ephemeral storage
+
+other important facts:
+	security group must be assigned to an instance during the creation process
+
+	each instance must be placed into an existing vpc, az, and subnet
+
+	automated (bootstrapping) custom launch commands can be passed into the instance during launch via 'user-data' scripts
+
+	'tags' can be used to help name and organize provisioned instances
+
+	encrypted key-pairs are used to manage login authentication
+
+	there are limits on the amount of instances you can have running in a region at any particular timeframe
+
+
+buying options
+
+	on-demand
+		choose any instance type to provision/terminate at any time
+		most expensive
+		most flexible
+		only charged when running:
+			per second pricing: amazon linux and ubuntu ami
+			hourly pricing: windows, rhel, and any other amis
+
+	reserved
+		purchase for a set time period of 1 to 3 years
+		allows a significant price reduction 
+		pay upfront/partial upfront/no upfront
+		responsible for the entire price- regardless how often you use it
+
+	spot
+		bid for an instance type and only pay for and use that instance when the spot price is equal to or below your 'bid' price
+		prices fluctuate
+		provisioned instances terminate when the spot price is greater than your bid price
+		bid on these for 'non production applications'
+
+virtualization
+	ec2 is run using the Xen hypervisor software
+
+	hvm ami (hardware virtual machine ami)
+		run as if bare-metal hw
+		ec2 host system emulates underlying hw
+		can take advantage of hw extensions, such as advanced networking
+
+	pv ami (paravirtual)
+
+ip addresses
+	all ec2 instances are automatically created with a private ip address
+
+	public ip is required if you want ec2 to have direct communication with resources across the internet
+
+
+bootstrapping and meta-data
+
+	MEMORIZE THESE:
+	view instance data:
+		curl http://169.254.169.254/latest/user-data
+		(this displays bootstrapping commands - i.e. bash script)
+	view meta data:
+		curl http://169.254.169.254/latest/meta-data
+		(displays ami, instance type, etc)
+
+
+placement group
+	cluster of instances within the same az
+	basically, you want to reduce latency and they need to be physically close to one another (10 gpbs network connection between them)
+
+	suggested to launch all instances at the same time in a single request
+
+	instances not originally launched/created in the placement group cannot be moved into the placement group
+
+	how to resolve capacity error? stop all instances in the placement group and then restart them
+
+	placement groups cannot be merged
+
+	they cannot span azs (bc they need to be physically close)
+
+	the names must be unique within your aws account
+
+	they can be 'connected' but not merged. the speed will be limited to the latency between the two placement groups
+
+	instances must have 10 gigabit network speeds in order to take advantage of placement groups (proper instance type needed basically--- something like an m4 instance)
+
+
+elastic file system (efs)
+
+	efs is storage but it's only used with ec2
+
+	storage option for ec2 that allows for a scalable storage option
+
+	storage is ELASTIC
+		will increase/decrease as you add/remove files
+		apps running on an ec2 instance with efs will always have the storage they need w/o having to provision and attach larger storage devices
+
+	efs is fully managed (thus no maintenace)
+
+	best performance with an AMI with linux kernel 4.0 or greater (uname -a to see this info most likely)
+
+
+	benefits of efs:
+		can be accessed by one or more ec2 instances at the same time 
+			shared file access across all ec2 instances
+			apps that span multiple ec2 instances can access the same data
+		
+		elastic file systems can be mounted to on-premise servers (when connected to your vpc and aws direct connect)
+
+		can scale to petabytes in size
+
+		pay only for the amount of storage you are using
+
+	security:
+		control file system access through POSIX permissions
+		vpc for network access control, and iam for api access control
+		encrypt data at rest using aws key management service (kms)
+
+	when to use:
+		big data, media processing, web serving and content mgmt
+
+
+
+
+
+
