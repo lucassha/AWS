@@ -1,0 +1,40 @@
+swf
+
+simple workflow
+
+essentials:
+
+	swf is a fully-managed 'work flow' service provided by aws
+
+	a swf workflow allows an architect/developer to implement distributed, asynchronouse applications as a workflow
+
+	a workflow coordinates and manages the execution of activites that can be run asynchronously across multiple computing devices
+
+	swf has consistent execution
+
+	guarantees the order in which tasks are executed
+
+	there are no duplicate tasks
+
+	the swf service is primarily an API which an application can integrate its work flow service into. this allows the service to be used by non-aws services, such as an on-premise data center
+
+	a workflow execution can last up to 1 year
+
+
+components:
+
+	workflow
+		a sequence of steps required to perform a task
+		iti s also commonly referred to as a decider
+
+	activities
+		a single step (or unit of work) in the workflow
+
+	tasks
+		what interacts with the 'workers' that are part of the workflow
+		activity task
+			tells the worker to perform a function
+		decision task
+			tells the decier the state of the workflow execution, which allows the decider to determine the next activity to be performed
+	worker
+		responsible for receiving a task and taking action on it. can be any type of component such as an ec2 instance or even a person

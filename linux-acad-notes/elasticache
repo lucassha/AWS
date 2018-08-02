@@ -1,0 +1,21 @@
+elasticache
+
+essentials:
+	elasticache is a fully managed, in memory cache engine
+
+	it is used to improve db performance by caching results of queries that are made to a db
+
+	elasticache is great for large, high performance or high taxing queries - and can store them insdie of a cache (elasticache cluster) that can be accessed later (instead of repeat requests continually hitting the primary db)
+
+	it reduces the load on the database which increases performance
+
+	elasticache allows for managing web sessions and also caching dynamic generated data
+
+
+	available engines to power elasticache include:
+		memached (mem-cache-d)
+		redis
+
+	generally, the application needs to be built to work with either redis or memcached
+
+	popular options like mysql have memcached plugins which allow an application to easily work with elasticache (if using memcached as the engine)

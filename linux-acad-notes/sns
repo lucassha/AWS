@@ -1,0 +1,39 @@
+sns
+
+essentials:
+	
+	sns coordinates and manages the sending and delivery of message to specific endpoints.
+
+	we are able to use sns to receive notifications when events occur in our aws environment
+
+	sns is integrated into many aws services so it is very easy to set up notifications based on events that occur in those services
+
+	with cloudwatch and sns, a full environment monitoring solution can be created that notifies administrators of alerts, capacity issues, downtime, changes in the environment, and more
+
+	this service can also be used for publishing ios/android app notifications and creating automation based off notifications
+
+components:
+
+	topic:
+		the group of subscriptions that you send a message to
+
+	subscription:
+		an endpoint that a message is sent
+
+		endpoints include:
+			http
+			https
+			email
+			email-json
+			sqs
+			application, mobile app notifications
+			lambda
+			sms (cellular text sms)
+
+	publisher:
+		the 'entity' that triggers the sending of a message
+			that includes:
+				human
+				s3 event
+				cloudwatch alarm
+

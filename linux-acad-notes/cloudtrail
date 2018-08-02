@@ -1,0 +1,13 @@
+cloudtrail
+
+essentials:
+	
+	cloudtrail is an api logging service that logs ALL api calls made to aws
+
+	it does not matter if the api calls from the command line, sdk, or console
+
+	all created logs are placed into a designated s3 bucket - so they are highly available by default
+
+	cloudtrail logs help when addressing security concerns by allowing you to view what actions users on your aws account have performed
+
+	since aws is just one big api  - cloudtrail can log every single action taken in your account

@@ -1,0 +1,260 @@
+s3
+
+pay for only the storage you actually use
+
+serves as durable target storage for kinesis and emr, it is used as the storage for ebs, and rds snapshots, and it is used as data staging or loading storage mechanism for redshift and dynamodb
+
+common uses:
+	backup and archive for on-premises or cloud data
+	content, media, and sw storage and distro
+	big data analytics
+	static website hosting
+	cloud-native mobile and internet application hosting
+	disaster recovery
+
+glacier
+	optimized for data archiving and long-term backup at extremely low cost
+
+	suitable for 'cold data' which is data rarely accessed and for which a retrieval time of three to five hours is acceptable
+
+	can be used as both a storage class of S3 and an independent archival storage service
+
+
+s3 is independent of a server and is accessed over the internet. data is managed usin an api built on standard http verbs
+
+each s3 bucket contains data and metadata. objects reside in containers called buckets. each object is identified by a unique user-speicified filename and the bucket name must be unique as well
+
+s3 objects are automatically replicated on multiple devices in multiple facilities within a region. 
+
+
+bucket - container (web folder) for objects (files) stored in s3. every object is contained in a bucket. bucket names are global. 100 per account. 
+
+
+regions -
+	namespaces for s3 buckets are global but each s3 bucket is created in a specific region. this lets you control where your data is stored. thus, your bucket can be closer to customers to minimize latency.
+
+
+objects - 
+	can store virtually any kind of data in any format
+
+	objects can range from 0 bytes to 5tb 
+
+	a single bucket can hold an unlimited number of objects
+
+	each object consists of data (the file itself) and metadata (data about the file)
+
+	s3 doesn't really care about the actual data. it's just a series of bytes.
+
+	the metadata associated with an s3 object is a set of name/value paris that describe the object.
+
+	two types of metadata:
+
+		system metadata:
+			created and used by s3 itself and includes things like the dat last modified, object size, md5 digest, and http content type
+		user metadata:
+			optional metadata. it can only be specified at the time an object is created. you can use custom metadat to tag your data with attributes that are meaningful
+
+
+keys -
+	every object stored in an s3 bucket is identified by a unique identifier called a key. you can think of the key as a filename.
+
+	a key can be up to 1024 bytes 
+
+	keys must be unique within a single bucket but different buckets can contain objects with the same key. 
+
+
+the combination of bucket, key, and optional version id uniquely identifies an s3 object
+
+
+remember, a bucket is a single flat namespace of keys with no structure. you can have delimiters (like /) to make it seem like a folder but it is not.
+
+
+s3 operations:
+	create/delete a bucket
+	write an object
+	read an object
+	delete an object
+	list keys in a bucket
+
+
+
+durability - addresses the question 'will my data still be there in the future'
+
+availability - address the question 'can i access my data right now'
+
+s3 standard storage
+	99.999999999% durability
+	99.99% availability
+
+s3 achieves high durability by automatically storing data redundantly on multiple devices in multiple facilities within a region. 
+
+
+s3 is an eventually consistent system, which means that it takes some time for data to propagate to all locations. as a result, info will need time to populate. for new objects, this isn't the case but it is for existing objects
+
+
+by default, only you have access to an s3 bucket. to adjust use an ACL, bucket policies, or IAM
+
+
+ACL -
+	allow you to grant certain permissions: read, write, or full control at the object or bucket level. ACLs are best used today for a limited set of use cases, such as:
+		enabling bucket logging
+		making a bucket that hosts a static website to be world-readable
+
+
+bucket policies - the recommended access control mechanism for s3. they are very similar to IAM policies but are subtly different in that:
+	
+	they are associated with the bucket resource instead of an IAM principal
+
+	they include an explicit reference to the IAM principal in the policy. this principal can be associated with a different aws account, so s3 bucket policies allow you to assign cross-account access to s3 resources
+
+with a bucket policy, you can specify: 
+	who can access the bucket
+
+	from where
+
+	during what time of the day
+
+
+storage classes
+
+	s3 standard:
+
+		high durability, high availability, low latency, high performance
+
+
+	s3 standard infrequent access (ia):
+
+		offers the same durability, low latency, and high performance
+
+		designed for long-lived, less frequently accessed data
+
+		standard-ia has a lower per gb monthly storage cost but price model includes a min object size of 128kb, min duration (30 days)
+
+		best suited for infrequently accessed data that is stored for longer than 30 days
+
+
+	s3 reduced redundancy storage (rrs):
+
+		offers slightly lower durability (4 nines) than standard or standard ia. 
+
+		it is most appropriate for derived data that can be easily reporduced, such as image thumbnails
+
+
+	amazon glacier:
+
+		secure, durable, and extremely low cost for data that does not require real-time access, such as archives and long-term backups
+
+		optimized for infrequently access data where a retrieval time of several hours is suitable
+
+		for retrieval, you request in api and then several hours later is it copied to s3 rrs.
+
+		the original object data remains in glacier until explicitly deleted
+
+		glacier is a standalone storage service with a separate api 
+
+
+object lifecycle management:
+
+	basically the data can shift depending on how often it is accessed
+
+	store initially in standard, shift to ia after 30 days, shift to glacier after 90
+
+
+encryption:
+
+	to encrypt data in flight, use SSL API endpoints. ensures all data sent to and from s3 is encrypted while in transit using the http protocol
+
+	to encrypt s3 data at rest, you can use several variations of server-side encryption(sse)
+
+
+	for maximum simplicity and ease of use, use server-side encryption with AWS managed keys (sse-s3 or sse-kms)
+
+
+versioning:
+	
+	allows you to preserve, retrieve, and restore every version of every object stored in your s3 bucket. if a user makes an accidental change or maliciously delets an object in your s3 bucket, you can restore the object to its original state simply by referencing the version id in addition to the bucket and object key. 
+
+	versioning is turned on at the bucket level. once enabled, versioning cannot be removed from a bucket; it can only be suspended
+
+
+pre-signed URLs:
+
+	temporary access through a url. the pre-signed urls are valid only for a specified time duration. this is particularly useful to protect again 'content scraping' of web content such as media files stored in s3
+
+
+multipart upload:
+
+	three step process:
+
+		initiation
+
+		uploading the parts
+
+		completion
+
+	in general, you should use multipart upload for objects larger than 100mb, and you MUST use multipart upload for objects larger than 5gb. 
+
+	when using the high level apis and s3 commands in the aws cli, multipart upload is automatically performed for large objects
+
+	you can set up an object lifecycle policy on a bucket to abord incomplete multipart uplaods after a specified number of days. this will minimize the storage costs associated with multipart upalods that were not completed
+
+
+range.get = download only a portion of the object
+
+
+cross region replication:
+
+	replicate all new objects in the source bucket in one aws region to a target bucket in another region. 
+
+	to enable cross region replication, versioning must be turned on for both source and destination buckets, and you must use an IAM policy to give s3 permission to replicate objects on your behalf.
+
+	cross region replication is commonly used to reduce the latency required to access objects in s3 by placing objects closer to a set of users or to meet the requirements to store backup data at a certain distance from the source
+
+	if turned on in an existing bucket, cross region replication will only replicate new objects. existing objects will not be replicate and must be copied into the new bucket via a separate command. 
+
+
+logging
+
+	logging is off by default
+
+	when enabling logging, you must choose a location for where they will go. they can be stored in the same bucket or a different one
+
+	logs include info such as:
+		requestor account and ip
+		bucket name
+		request time
+		action (get, put, list)
+		response status or error code
+
+
+event notifications
+
+	sent in response to actiosn taken on objects uploaded or stored in s3
+
+
+
+glacier
+	
+	data is stored in archives. an archive can contain up to 40tb or data, and you can have an unlimited number of archives. all archives are automatically encrypted and immutable 
+
+	vaults are the containers for the archives. each aws account can have up to 1000 values. you can control access to your valuts and the actions allowed using IAM policies or vault access policies
+
+
+s3 vs glacier
+
+	glacier supports 40tb archives versus 5tb objects for s3
+
+	archives in glacier are identified by system generated IDs, while s3 lets you use 'friendly' key names
+
+	glacier archives are automatically encrypted, while encryption at rest is optional for s3
+
+
+
+
+
+
+
+
+
+
+

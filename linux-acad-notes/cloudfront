@@ -1,0 +1,27 @@
+cloudfront
+
+essentials:
+	global CDN which delivers content from an 'origin' location (the source of the content) to an 'edge' location (aws cdn data center)
+	an edge location allows the caching of static objects from the origin location 
+
+	an origin can be:
+		s3 bucket
+		elastic load balancer that distributes requests among origin ec2 instances
+
+	cloudfront can integrate with route53 for 'alternate' CNAMEs
+		this allows you to create a url such as http://cdn.mydomain.com that works with your distribution
+
+
+benefits:
+	users experience lower latency and content load time
+	reduces load on your applications resources (origin services) thus reducing costs
+
+updating cached files:
+	caching is done based off the object name
+	in order to serve a new version of an object, either create an ew object with a new name or create an 'invalidation' on the cloudfront distribution based off the object name
+	'invalidations' have a cost, so if you have to invalidate a large cloudfront distribution then perhaps you should just create a new distribution and move dns names
+	cached objects can also be set with a specific expiration time/date or set to not cache at all
+
+signed URLs:
+	allow access to 'private content' by creating a temporary, one-time-use URL based off the number of seconds you want it accessible
+	signed with a X.509 certificate 

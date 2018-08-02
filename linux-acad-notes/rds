@@ -1,0 +1,112 @@
+rds
+
+rds = mysql
+dynamoDB = noSQL
+elasticache = high performance
+redshift = data warehousing
+
+
+essentials:
+	rds is a fully managed relational database service
+
+	it does not allow access to the underlying OS (fully-managed)
+	
+	you connect to the RDS database server in the same way you would connect to a traditional on-premise database instance (i.e. mysql command line)
+
+	rds has the ability to provision/resize hardware on demand for scaling
+
+	you can enable multi az deployments for backup and high available solutions
+
+	utilize read replicas (mySql/postgresql/aurora) to help offload hits on your primary database
+
+	relational databases are databases that organize stored data into tables
+
+	associated tbales have defined relationships between them
+
+
+	databases supported by rds:
+		mysql
+		mariadb
+		postgresql
+		oracle
+		ms sql server
+		aurora:
+			is a home grown relational db that has been forked from, and fully compatible with, mysql
+			it has 5 times better performance than mysql and a lower price point than commercial dbs
+
+	benefits of running rds instead of a db on your own instance:
+		automatic minor updates
+		automatic backups (point-in-time snapshots)
+		not required to manage operating system
+		multi az with a single click
+		automatic recovery in event of a failover
+
+
+rds backups:
+	aws provides automated point-in-time backups against the rds database instance
+
+	automated backups are deleted once the database instance is deleted and cannot be recovered (but you can take your own snapshots of backups before deleting)
+
+	backups on database engines only work correctly when the database engine is 'transactional' but do currently work for all supported db types
+
+	mysql requires InnoDB for reliable backups
+
+
+rds multi az failover:
+	
+	multi az failover (AUTOMATIC multi az failover) synchronously replicates data to a backup (standby) db instance in another availability zone (but in the same region)
+
+	in the event of:
+		service outage in an az
+		primary db instance failure
+		instance server type is changed
+		manual failover initiated
+		updating sw version
+
+		AWS will automatically switch the CNAME DNS record from the primary instance to the stand-by instance
+
+	rds backups are taken against the stand-by instance to reduce i/o freezes and slow down IF multi-az is enabled
+
+	in order for multi az to work, your primary db instance must be launed into a 'subnet group'
+		note: an rds instance must be launced into a subnet (inside a vpc) just like an ec2 instance. so the same security/connectivity rules, and highly available/fault tolerant concepts apply
+
+
+rds read replicas:
+	read replicas are asynchronous copies of the primary db that are used for read only purposes (only allow read connections)
+
+	when you write new data to the primary database, aws copies it for you to the read replica
+
+	you can create and have multiple read replicas for a primary db
+
+	read replicas can be created from other read replicas (so no performance hit on the primary db)
+
+	mysql, mariadb, postgresql, and aurora currently support read replicas
+
+	you can monitor replication lag using cloudwatch
+
+
+benefits of using read replicas:
+	read replicas allow for all read traffic to be redirected from the primary database to the read replica. this will greatly improve performance on the primary database
+
+	read replicas allow for elasticity in rds - you can add more read replicas as demand increases
+
+	you can promote a read replica to a primary instance
+
+	mysql:
+		replica for importing/exporting data to rds
+		can replicate across regions
+
+
+when should you use read replicas?
+	high volume, non-cached database read traffic 
+
+	running business functions such as data warehousing
+
+	importing/exporting data into rds
+
+	rebuilding indexes:
+		ability to promote a read replica to a primary instance
+
+
+
+

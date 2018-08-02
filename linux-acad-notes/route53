@@ -1,0 +1,71 @@
+route 53
+
+essentials:
+	domain management service (dns hosting service) provided by aws
+
+	key features include:
+		domain registration
+			register domain names, such as orionpapers.com
+		domain name system (dns) service
+			translates friendly domains names into ip addresses
+			route 53 responds to dns queries using a global network of authoritative DNS servers, which reduces latency
+		health checking
+			route 53 sends automated requests over the internet to your application to verify that it's reachable, available, and functional
+
+	can manage external dns for domain routing - routing request for some website to the proper aws resources such as cloudfront, elb, ec2, or rds
+
+	commonly used with an elb to direct traffic from the domain to the elb (and thus have traffic evenly distributed)
+
+	can be used to manage internal dns for custom internal hostnames within a vpc as long as the vpc is configured for it
+
+	latency, geo, basic, and failover routing policies allow for region-to-region fault tolerant architecture design
+
+	can easily configure for failover to S3 or cloudfront 
+
+
+route 53 hosted zones:
+	hosted zones stores dns records for your domain
+
+	basically, it contains all the rules (record sets) that tells route 53 what to do with a dns request
+
+	there are both public and private hosted zones:
+
+	public hosted zone: a container that holds information about how you want to route traffic on the internet for a domain, such as linuxacademy.com, and its subdomains
+
+	private hosted zone: a container that holds information about how you want to route traffic for a domain and its subdomains within one or more amazon vpcs
+
+	after you create a hosted zone for your domain, you create resource record sets to tell the DNS how you want traffic to be routed for that domain
+
+	hosted zones come pre-populated with NS (name server) and SOA (start of authority) record sets
+
+
+route 53 record sets:
+	record sets are indstructions that actually match domain names to ip addresses
+	record sets are comprised of various options, including:
+		record type
+		standard/alias
+		routing policy
+		evaluate target health
+
+	common record types include:
+	A: used to point to a domain to an ipv4 ip
+	AAAA: used to point to a domain of an ipv6
+	CNAME: used to point to a host/name to another host/name
+	MX: used to route email (mail exchange)
+
+routing policy:
+	simple: route all traffic to one endpoint
+	weighted: route traffic to multiple endpoints (manual load balancing)
+	latency: route traffic to an endpoint based o nthe users latency to various endpoints
+	failover: route traffic to a 'secondary' endpoint if the 'primary' is unavailable
+	geolocation: route traffic to an endpoint based on the geographical location of the user
+
+evaluate health policy:
+	can monitor the health of your application and trigger an action
+
+
+S3 DNS failover
+	s3 bucket can be used as a failover endpoint. 
+	this can provide an extremely reliable backup solution if your primary endpoint fails
+	bucket name and website name must be exactly the same
+	

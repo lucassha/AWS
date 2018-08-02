@@ -1,0 +1,183 @@
+Security
+
+IAM-(Identity and Access Mgmt)
+
+Two types of IAM policies:
+
+	managed policies:
+		standalone policies that can be created by customers or AWS. exps of this includes administrator access, power user access, read-only access, and IAM read-only access
+
+	inline policies:
+		embedded in a principal entity, such as a user, group, or role. the policy is an inherent part of the entity
+
+
+Roles
+	
+	IAM roles are temporary user credentials. principle of least privilege means that an entity should not have excessive sets of permissions. 
+
+	roles are used to delegate access to AWS resources. the role provides temporary access to eliminate the need to use static AWS credentials. think of roles as temporary users.
+
+
+Best practices for securing account:
+	-require mfa for root access
+	-physically secure root account hw mfa in a safe place
+	-create indvidual IAM users
+	-use groups to assign permissions to IAM users
+	-enable mfa for privileged users
+	-use IAM roles for apps that run on EC2 instances
+	-delegate by using IAM roles
+	-rotate credentials
+	-remove root credentials
+	-use access levels to review IAM permissions
+	-use IAM roles to provide cross-account access
+
+
+key pairs
+	ec2 instances created from a public AMI use a public/private key pair instead of a password for signing in via SSH (think RSA)
+
+	amazon cloudfront key pairs can be created only by the root acct and cannot be created by IAM users
+
+aws kms (key management services)
+	used to generate and manage crypto keys and operate as a crypto service provider for protecting data. 
+
+
+aws cloudHSM security
+	dedicated access to a HW security module (HSM) appliance designed to provide secure crypto key storage and operations in an intrusion-resistant, tamper-evident device.
+
+	designed to be used with EC2 and VPC, which provide the appliance with its own private IP within a private subnet.
+
+	can connect to cloudHSM appliances from your own ec2 servers through ssl/tls, which uses 2 way digital cert auth and 256-bit ssl encryption
+
+	after 3 unsuccessful attempts to access an hsm partition with admin credentials, the hsm appliance erases its hsm partitions
+
+
+cloudtrail
+	log of all requests for aws resources in your acct
+
+	captures info about every api call including sign-in
+
+	logs are delivered every 5 mins/300seconds
+
+	by default, logs are stored in s3 but can also be archived in glacier to help meet audit and compliance reqs
+
+	cloudwatch
+		monitor system, app, and custom log files from ec2 instances
+
+vpc flow logs
+	capture info about the IP traffic going to and from network interfacts in your vpc
+
+	stored in cloudwatch logs
+
+	elb and elastic network interfact provide access logs that capture detailed info about requests or connections sent to the load balancer
+
+cloudwatch
+	provides a means for monitoring aws resources
+
+	cloudtrail logs can be monitored in real time using cloudwatch
+
+aws config
+	records configuration changes to an aws account. can be used to retrieve inventory of aws resources in an acct at a particular time
+
+	use cases include the following:
+		resource discovery
+		troubleshooting
+		change mgmt
+		audit compiance
+		security analysis
+
+amazon inspector
+	automated security assessment service that helps improve the security and compliance of apps deployed on aws
+
+aws certificate manager
+	provision, manage, and deploy ssl/tls certs 
+
+aws waf (web application firewall)
+	what u think.
+
+	tightly integrated with cloudfront and application load balancer (both used to deliver content to websites and apps)
+
+	when you use waf on cloudfront, your rules run in all aws edge locations around the world close to end users. no performance loss that way.
+
+	blocked requests are stopped before they reach your web servers. 
+
+	when using waf on application load balancer, rules run in-region and can be used to protect internet-facting and internal load balancers
+
+aws trusted advisor
+	customer support service
+
+	provides alerts on most common security misconfigs that can occur
+
+ebs (elastic block storage)
+	redundantly stored in multiple physical locations at no extra charge
+
+	replication is stored within the same AZ
+
+	recommended you conduct regular snapshots and save them to S3 for long-term data durability
+
+
+
+networking
+
+elastic load balancing (elb) security
+	used to manage traffic on a fleet on ec2 instances, distributing traffic to instances across all AZs within a region
+
+	security benefits:
+		takes over encryption work from ec2
+
+		when used in a vpc, supports creation and mgmt of security groups associated with elb to provide additional networking and security options
+
+		supports end-to-end traffic encryption used tls on networks that use https
+
+	elb allows the use of perfect forward secrecy, which uses session keys that are ephemeral and not stored anywhere
+
+
+	elb access logs contain info about each http and tcp request processed by your load balancer
+
+
+vpc security
+	normally, each ec2 instance is randomly assigned a public ip addr in the ec2 address space
+
+	vpc enables you to create an isolated portion of the cloud and launch ec2 instances that have private (rfc 1918) address in the range of your choice
+
+	security features include:
+		security groups
+		network ACLs
+		routing tables
+		external gateways
+
+	you must create specific security groups inside your vpc. in addition, vpc sec groups have additional capabilities that ec2 instances do not have, such as being able to change the security group after the instance is launched and being able to specify any protocol number
+
+	each vpc is distinct. network traffic is isolated from all other vpcs. 
+
+	subnets
+		can create one or more subnets in each vpc. each instance launched in the vpc is connected to one subnet. mac spoofing and ARP spoofing are blocked.
+
+		each subnet in a vpc is associated with a routing table, and all networking traffic leaving the subnet is processed by the routing table to determine the destination
+
+	network ACLs
+		stateless traffic filters that apply to all traffic inbound or outbound from a subnet within a vpc. ACLs contain ordered rules to allow or deny traffic based on IP protocol, service port, and source/destination ip addresses
+
+	virtual private gateway
+		enables private connectivity between the vpc and another network
+
+		network traffic within each vpg is isolated from network traffic within all other virtual private gateways
+
+	cloudfront
+		distribute content with low latency and high data transfer speeds
+
+		uses a global network of edge locations. it's a cdn. this is the same as point of presence essentially.
+
+		requests for customers' objects are auto routed to the nearest edge location so content is delivered with optimal performance
+
+	aws recommends that customers not place sensitive information in S3 metadata
+
+	sse = server side encryption
+
+
+
+
+
+
+
+
+

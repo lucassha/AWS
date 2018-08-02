@@ -1,0 +1,70 @@
+ecs
+
+ec2 container services
+
+docker compatible container service provided by aws. it allows for easy and fast container deployment onto fleets of ec2 instances, with the added benefit of aws highly available and fault tolerant infrastructure. ecs is great for distributed applications and microservices
+
+
+essentials:
+	ecs allows you to easily create and manage a fleet of docker containers on a cluster of ec2 instances
+
+	why use ecs/containers?
+		create distributed applications and microservices:
+			create application architecture comprised of independent tasks or processes (microservices)
+
+			for exp: can have separate containers for various components of your application:
+				webserver
+				application server
+				message queue
+				backend servers
+			this allows you to start, stop, manage, monitor, and scale each container independently
+
+	batch and etl jobs:
+		package batch and etl jobs into containers and deploy them into a shared ec2 cluster
+
+		run different versions of the same job or multiple jobs on the same cluster
+
+		share cluster capacity with other processes and/or grow job dynamically on-demand to improve resource utilization
+
+	continuous integration and deployment:
+		by using docker's image versioning, you can use containers for continuous integration and deployment
+
+		build processes can pull, build, and create a docker image that can be deployed into your containers
+
+		this allows you to avoid an application from working in a dev environment and not working in a production environment because the docker daemon is the same across all environments
+
+
+dockerfile:
+	a plain text file (script) that specifies all of the components that are included in the container
+
+	basically, it's the instructions for what will be placed inside a given container
+
+container/docker image
+	built from the dockerfile
+	the docker image contains all the downloaded software, code, runtime, system tools, and libraries (as outlined in the dockerfile)
+		i.e. the dockerfile specifies that PHP to be downloaded and installed, then the docker image will have php downloaded and installed
+
+	container registry
+		a repository where container/docker images are stored and accessed from when needed
+
+		a container registry can be:
+			located on aws via the ERC service (ec2 container registry)
+			3rd party hosted repo like docker hub
+			self-hosted registry
+
+
+ecs agent:
+	ecs agent runs on each ec2 instance in the ecs cluster
+	it communicates information about the instances to ecs, including:
+		running tasks
+		resource utilization
+	the ecs agent is also responsible for starting/stopping tasks (when told by ecs)
+
+
+ecs task definition:
+	a json formatted text file that contains the 'blueprint' for your application, including:
+		which container/docker image to use
+		the repo the image is located in
+		which ports should be on the container instance
+		what data volumes should be used with the containers
+		

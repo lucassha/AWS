@@ -1,0 +1,86 @@
+sqs
+
+simple queue service
+
+essentials:
+	
+	sqs provides the ability to have hosted/highly available queues that can be used for messages being sent between servers
+
+	this allows for the creation of distributed/decoupled application components
+
+	sqs is used to create decoupled application environments
+
+	messages between two servers are retrieved through polling
+
+
+two types of polling:
+	
+	long polling (1-20 seconds):
+		allows the sqs service to wait until a message is available in a queue before sending a response, and will return all messages from all sqs services
+
+		long polling reduces api requests (over short polling)
+
+	short polling:
+		sqs samples a subset of servers and returns messages from just those servers
+
+		will not return all possible messages in a poll
+
+		increase api requests (over long polling), which increases costs
+
+
+other important sqs facts:
+	
+	each message can contain up to 256kb of text (in any format)
+
+	amazon sqs offers two different types of queues:
+
+		standard queue: guarantees delivery of each message at least once but does not guarantee the order (best effort) in which they are delivered to the queue
+
+		fifo queue- designed for applications where the order of operations and events is critical, or where duplicates can't be tolerated
+
+	sqs is also highly available and redundant
+
+
+sqs workflow:
+
+	generally a 'worker' instance will 'poll' a queue to retrieve waiting messages for processing
+
+	auto scaling can be applied based off of queue size so that if a component of your application has an increase in demand, the number of work instances can increase 
+
+
+
+decoupled architecture:
+
+	tightly coupled system:
+		a system architecture of components that are not just linked together but are also dependent upon each other
+
+		if one component fails, they all fail
+
+	loosely coupled/decoupled system:
+		multiple components that can process information without being connected
+
+		components are not connected - if one fails the rest of the system can continue w/o processing (fault tolerant/highly available)
+
+	aws services that are used for distributed/decoupled system architectures:
+		swf
+		sqs
+
+
+sqs message:
+
+	a set of instructions that will be relayed to the 'worker'  instaces via the sns queue
+
+	can be up to 256kb of text (in any format)
+
+	each message is guaranteed to be delivered at least once:
+
+		order is not guaranteed
+
+		duplicates can occur
+
+
+sqs queue:
+
+	a queue stores messages (for up to 14 days) that can be retrieved through polling
+
+	queues allows components of your application to work independently of each other (decoupled environments)

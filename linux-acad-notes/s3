@@ -1,0 +1,161 @@
+s3
+
+simple storage service
+
+essentials
+	main storage service for aws. can serve the following purposes:
+
+		bulk static object storage
+		various storage classes to optimize cost v needed object availability
+		object versioning
+		access restrictions via s3 bucket policies/permissions
+		object mgmt via lifecycle policies
+		hosting static files and websites
+		origin for cloudfront cdn
+		file shares and backup/archiving for hybrid networkings (via AWS storage gateway)
+
+	important notes:
+		objects stay within an aws region and are synced across all AZs for extremely high availability and durability
+
+		you should always create an s3 bucket in a region that makes sense to its purpose:
+			serving content to customers
+			sharing data with ec2
+
+		s3 read consistency rules:
+			all regions now support read-after-write consistency for PUTS of NEW objects into s3
+
+			objects are available immediately after 'putting' an object into s3
+			all regions use eventual consistency for PUTS overwriting existing objects and DELETES of objects 
+
+buckets
+	main storage container of s3 and contain a grouping of info and have sub name spaces that are similar to folders
+	tags can be used to organizae buckets
+
+	each bucket must have a unique name across all of aws
+
+	bucket limitations:
+		only 100 buckets can be created in an aws acct
+		bucket ownership cannot be transferred once a bucket is created
+
+objects
+	objects are static files that contain metadata information
+		set of name-key pairs
+		contain info specified by the user, and aws info such as storage type
+
+	each objects must be assigned a storage type, which determines the object's availability, durability, and cost
+
+	by default, all objects are private
+
+	objects can:
+		be as small as 0 bytes and as large as 5tb
+		have multiple versions (if versioning is enabled)
+		be made publicly available via url
+		automatically switch to a diff storage class or be deleted
+		be encrypted
+		organized into sub-name spaces called folders
+
+	object encryption:
+		sse (server side encryption): s3 can encrypt the object before saving it on the partitions in the data centers and decrypt it when it is downloaded. uses AES-256
+		can use your own encryption keys
+		ssl terminated endpoints for the api
+
+folders
+	supports the concept of 'folders' but it's more done for simplicity. s3 does this by using key-name prefixes for objects
+
+	s3 has a flat structure, there is no hierarchy like you would see in a typical file system
+
+permissions
+	all buckets and objects are private by default
+	access can be granted through resource based policies or through traditional iam policy
+
+	resource based policies are:
+		bucket policies:
+			policies attached only to the s3 bucket (not an iam user)
+			permissions in the policy are applied to all objects in the bucket
+			policy specifies what actions are allowed or denied for a particular user of that bucket 
+
+	s3 access control lists:
+		grant access to users in other aws accounts or to the public
+		both buckets and objects has ACL
+		object acls allow us to share an s3 object via the public w url
+
+object versioning
+	feature to manage and store all old/new/deleted versions of an object
+	by default, versioning is disabled
+	once enabled, you can only suspend it
+	suspending versioning only prevents new versions from being created. all the old versions will still persist
+	versioning can only be set on the bucket level and applies to ALL objects in the bucket
+
+	lifecycle policies can be applied to specific versions of an object
+	versioning and lifecycle policies can both be enabled on a bucket at the same time
+	can be used with lifecycle policies to create a great archiving and backup solution in s3
+
+lifecycle policies
+	an object lifecycle policy is a set of rules that automate the migration of an object's storage class to a diff storage class (or deletion) based on specified time intervals
+
+	by default, lifecycle policies are disabled on a bucket/object
+
+	they are customizable
+
+	great for automating the mgmt of object storage and to be more cost efficient 
+
+	can be used with versioning to create a great archiving and backup solution in s3
+
+storage classes
+	storage class represents the 'classification' assigned to each object in s3. 
+
+	each storage class has varying attributes that dictate things such as:
+		storage cost
+		object availability
+		object durability
+		frequency of access (to the object)
+
+	four types of storage classes currently:
+
+		standard:
+			all purpose
+			default storage option
+			99.9999999999999999 (or something like that) durability
+			99.99% object availability
+			most expensive storage class
+
+		reduced redundancy:
+			designed for non-critical, reproducible objects
+			99.99% durability
+			99.99% availability
+			less expensive than the standard storage class
+
+		infrequent access (s3-ia)
+			designed for objects that you infrequently access but must be immediately available when accessed
+			99.9999999999999999 (or something like that) durability
+			99.90% object availability
+
+		glacier
+			designed for long term archival storage (not for backups)
+			may take several hours for objects to be retrieved
+			99.9999999999999999 (or something like that) durability
+			cheapest storage class 
+
+storage services (for uploading)
+	single operation upload: traditional upload. can upload up to 5gb in size; however, any file over 100mb should use multipart upload
+
+	multi-part upload: upload a single object as a set of parts. after upload, s3 reassemables the parts and creates the object. required for objects 5gb and larger, and HIGHLY SUGGESTED for over 100 mb. can upload a file up to 5tb in size. 
+
+	aws import/export: physically mail on premise data with a hdd to aws. they will import into either s3, ebs, or glacier within one business day of the physical device arriving. up to 16tb per job. good for disaster recov. amazon will ship s3 data to you as well.
+
+	snowball: petabyte scale data transportation. uses aws secure transfer appliance. quickly move large amounts of data into and out of aws. 
+
+	storage gateway: conects local data center sw applainces to cloud based storage such as s3. two types:
+		gateway cached volumes- create storage volumes and mount them as iSCSI on the on-premise servers. the gateway will store the data written to this volume in s3 and will cache frequently accessed data on premise in the on premise storage device. essentially, it allows lower latency for frequently accessed items
+
+		gateway stored volumes- store all the data locally in storage volumes. gateway will periodically take snapshots of the data as incremental backups and stores them on s3. 
+
+
+CORS cross origin resource sharing
+
+	cors is a method of allowing a web application located in one domain to access and use resources in another domain
+
+	this allows web applications running JS or HTML5 to access resources in an s3 bucket w/o using a proxy server
+
+	for aws, this (commonly) means that a web app hosted in one s3 bucket can access resources from another s3 bucket
+

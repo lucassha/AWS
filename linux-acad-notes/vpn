@@ -1,0 +1,54 @@
+vpn
+
+essentials:
+
+	virtual private network enables the ability to extend a subnet from one geographic location to another geographic location on two separate networks
+
+	extending the subnets allows the network at location 'a' to communicate internally with all resources at location 'b'
+
+	essentially, you are 'extending' the on-premise network to the cloud, or the cloud to the on-premise network
+
+
+	for aws, this allows us to communicate with all resources (like an ec2 instance) internally without the need for a public ip address and igw
+
+	it also provides an additional level of security by ensuring that traffic sent using the vpn is encrypted
+
+	vpn connection has two parallel routes (IPSec tunnels), which is for redundancy
+
+	only one virtual private gateway can be attached to a vpc (just like one igw)
+
+	a vpc can have both a vpg and an igw attached at the same time
+
+
+customer gateway:
+	
+	a physical device or software application at the on-premise location that acts as the 'connector' to the vpn connection
+
+	in your aws acct, the customer gateway component is where you configure the public IP address of the physical device or software application at the on-premise location
+
+	note: both a vpg and a customer gateway are required to establish a vpn connection
+
+
+virtual private gateway:
+
+	acts as the 'connector' on the vpc (aws) side of the vpn connection.
+
+	the vpg is connected to the vpc.
+
+	note: both a vpg and a customer gateway are required to establish a vpn connection
+
+
+vpn connection:
+	
+	the vpn connection is the actual link between the vpg and the customer gateway. 
+	the connection is set up and managed by aws
+	each connection uses two IPSec tunnels for redundancy
+
+
+router
+
+	aws has dispensed with the concept of having users physically set up and manage a router. however, it is important to understand that route tables are actually part of a 'router' assigned to your vpc
+
+	when setting up a vpn, the route table (for the subnet you wish to extend to) must include routes for the on-premise network that are used by the vpn, and point them to the virtual private gateway
+
+

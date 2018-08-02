@@ -1,0 +1,17 @@
+disaster recovery
+
+recovery time objective (RTO) - how much time it will take to get back online after a disruption
+
+recovery point objective (RPO) - how many hours of lost data that you have. for instance, if down at 2pm and the RPO is 2 hours, then you should have all data from noon back.
+
+
+back up / restore
+
+considerations:
+	retention time for media
+	security of archives
+	recovery/restoration of system
+
+pilot light:
+	ec2 instances ready i guess? idk
+

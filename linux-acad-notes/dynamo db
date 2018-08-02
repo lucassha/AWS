@@ -1,0 +1,27 @@
+dynamo db
+
+essentials:
+
+	fully managed, noSql db service
+
+	similar to mongoDB but is homegrown aws
+
+	schemaless, and uses a key-value store
+
+	you specify the required throughput capacity, and dynamoDB does the rest (being fully managed)
+
+	being fully managed means:
+		service manages all provisioning (and scaling) of underlying hardware
+
+		fully distributed and scales automatically with demand and growth
+
+		built as a fault tolerant highly available service
+			on the back end, it fully synchronizes the data across all of the azs within the region you created the dynamo db tables in
+
+	dynamoDb can also easily integrate with other aws services, such as emr
+		can easily move data to a hadoop cluster in emr
+
+	popular use cases include:
+		iot (storing meta data)
+		gaming (storing session information, leaderboards)
+		mobile (storing user profiles, personalization)

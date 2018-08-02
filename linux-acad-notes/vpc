@@ -1,0 +1,153 @@
+vpc
+virtual private cloud
+
+	vpc spans multiple AZs and multiple data centers
+
+	enables you to launch aws resources into a virtual network that you've defined
+
+	designed to resemble:
+		private on premise data centers
+		private corporate network
+
+	private network features avai in aws vpcs
+		private and public subnets
+		scalable architecture
+		ability to extend corporate/on-premise network to the cloud as if it was part of your network (VPN)
+
+	important facts:
+		vpc is housed within a chosen AWS region
+		vpc spans multiple AZs within a region
+			this allows you to provision redundant resources in separate AZs while having them accessible on the same network (this is the foundation of high availability and fault tolerant architecture)
+		aws provides a dns server for your vpc so each instance has a hostname. however, you can run your own dns servers by changing the dhcp option set configuration within the vpc
+
+	benefits of a vpc:
+		ability to launch instances into a subnet
+		ability to define custom CIDR inside each subnet
+		configure routes between subnets via route tables
+		configure an internet gateway to provide a route to the internet for resources launched inside the vpc
+		create a layered network or resources
+		extend your on-premise network into the cloud with vpn/vpg and an IPsec vpn tunnel
+		layered security
+			instance level security groups (firewall on the instance level)
+			subnet level network ACLs(firewall on the subnet level)
+
+	limits
+		5 vpcs per region
+		5 IGWs per region
+		50 customer gateways per region
+		50 vpn connections per region
+		200 route tables per region / 50 entries per route table
+		5 elastic ip addresses
+		500 security groups per vpc
+		50 rules per security group
+		5 security groups per network interface
+
+
+	internet gateway
+		allows communication between instances in your vpc and the internet
+		horizontally scaled, redundant, and highly available
+		default vpc already has an igw attached
+
+		igw must knows:
+			only 1 igw can be attached to a vpc at a time
+			an igw cannot be detached from a vpc while there are active aws resources in the vpc (such as an ec2 instance or rds database)
+			an igw must be attached to a vpc if the resources inside the vpc need to connect to resources via the open internet
+
+	route tables
+		contains a set of rules, called routes, that are used to determine where network traffic is directed
+
+		route table's rules are comprised of two main components:
+			destination: the CIDR block range of the target(where the data is routed to)
+			target: a name identifier of where the data is being routed to
+
+		by default, all subnets traffic is allowed to each other avaialable subnet within your vpc which is called the local route
+
+		you cannot modify the local route
+
+		unlike an igw, you can have multiple 'active' route tables in a vpc
+
+		you cannot delete a route table if it has 'dependencies' 
+
+		best practice is to leave the default route table and create a new route table when new routes are needed for specific subnets
+
+
+	subnets
+		after creating a vpc, you can add one or more subnets in each az. each subnet must reside entirely within one az and cannot span zones. 
+
+		subnets MUST be associated with an AZ
+
+		a PUBLIC subnet HAS a route to the internet (it is associated with a route table that has an igw attached)
+
+		a PRIVATE subnet DOES NOT HAVE a route to the internet (it is associated with a route table that does NOT have an igw attached)
+
+		instances launched into a private subnet can't communicate with the internet
+
+		by default all subnets traffic is allowed to each other available subnet within the LOCAL target in the route table
+
+	nACLs
+		sits outside of the subnet
+
+		support allow and deny rules for traffic traveling into or out of a subnet
+
+		they are STATELESS, so return traffic must be allowed through an outbound rule
+
+		they process rules in number order when deciding whether to allow traffic 
+
+		rules are evaluated in order, starting with the lowest number - (i.e.- if traffic is denied at a lower rule number and allowed at a higher rule number, the allow rule will be ignored and the traffic will be denied)
+
+		the last rule in every ACL is a "catch all" deny rule (this means that unless a protocol/port is explicitly allowed, it will be denied)
+
+		for both inbound/outbound, your rules must be specifically ALLOWED.
+
+		a nacl is an optional layer of security for your vpc that acts as a firewall for controlling traffic in and out of one or more subnets
+
+		best practice is to increment numbers by 10 so if you have to place in a rule in a certain order it does not create an issue
+
+		note: your default vpc already has a nacl and it is associated with the default subnets
+
+
+		RULES:
+			rules are evaluated from lowest to highest based on rule #
+
+			the first rule found that applies to the traffic type is immediately applied, regardless of any rules that come after it (that may have a higher rule #)
+
+			a subnet can only be associated with ONE nacl at a time
+
+			an nacl allows or denies traffic from entering a subnet. once inside the subnet, other aws resources (i.e ec2 instances) may have an additional layer of security 
+
+
+	security groups
+		very similar to nacls in that they allow/deny traffic
+
+		however, security groups are security for the instance level (as opposed to subnet level)
+
+		in addition, the way allow/deny 'rules' work are different than ACLs
+			security groups support only allow rules
+			they are stateful, so return traffic requests are allowed regardless of rules
+			all rules are evaluated before deciding to allow traffic
+
+		best practice is to allow ONLY traffic that is required
+
+
+lab
+
+create vpc
+create igw
+create public/private routes
+create subnets
+associate subnets with the route table (in route tables)
+create your nacls
+make sure your nacls allows access for http and ssh for inbound and outbound (ssh inbound is always port 22, outbound port can change - you can use this: 120
+	Custom TCP Rule
+	TCP (6)
+	1024-65535
+	0.0.0.0/0
+	ALLOW)
+associate your subnets with the nacl
+create security group for individual instances
+
+
+
+
+
+

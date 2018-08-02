@@ -1,0 +1,7 @@
+disaster recovery
+
+dr = disaster recovery
+
+rto = recovery time objective
+
+rpo = recovery point objective. acceptable amount of data loss measured in time. for exp, if disaster at noon, all data before 11am is recovered. this means the RPO is one hour. 

@@ -1,0 +1,70 @@
+kinesis
+
+essentials:
+	kinesis is a real-time data processing service that continuously captures (and stores) large amounts of data that can power real-time streaming dashboards
+
+	using the aws provided SDKs, you can create real-time dashboards, integrate dynamic pricing strategies, and export data from Kinesis to other aws services
+
+	including:
+		emr (analytics)
+		s3 (storage)
+		redshift (big data)
+		lambda (event driven actions)
+
+	components:
+		stream
+		producers (data creators)
+		consumers (data consumers)
+		shards (processing power)
+
+
+benefits:
+	real time processing:
+		continuously collect and build applications that analyze the data as it is generated
+
+	parallel processing:
+		multiple kinesis applications can be processing the same incoming data streaming concurrently
+
+	durable:
+		kinesis synchronously replicates the streaming data across three data centers within a single aws region and preserves the data for up to 24 hours
+
+	scales:
+		can stream from as little as a few megabytes to several terabytes per hour
+
+
+when to use:
+	gaming:
+		collect gaming data such as player actions and feed the data into the gaming platform,f or exp a reactive environment based off of realtime actions of the player
+
+	real-time analytics:
+		collect iot sensors from many sources and high amounts of frequency and process it using kinesis to gain insights as data arrives in your environment
+
+	application alerts:
+		build a kinesis application that monitors incoming application logs in real-time and trigger events based off the data
+
+	mobile data capture:
+		mobile applications can push data to kinesis from countless number of devices which makes the data available as soon as it is produced
+
+
+kinesis producers:
+	producers are devices that collect data for kinesis processing
+	you build producers to continuously input data into a kinesis stream
+	producers can include:
+		IoT sensors
+		mobile devices
+	you can have literally thousands of different producers and scale based on need:
+		the more data you want to process, the more 'shards' you add to your kinesis stream
+		each 'shard' can process 2mb of read data per second, and 1mb of write data per second
+		
+
+kinesis consumers:
+	consumers consume the stream's data
+	this is done concurrently (multiple consumers can consume the same data at the same time)
+	consumers include (but not limited to):
+		real time dashboards
+		s3
+		redshift
+		emr
+	any application can consume the stream's data
+
+	kinesis keeps 24 hours of streaming data stored by default, but can be configured to store up to 7 days

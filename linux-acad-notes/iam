@@ -1,0 +1,89 @@
+IAM
+Identity and Access Management
+
+IAM is not regionally bound. It is GLOBAL
+
+It has a non-explicit deny rule, meaning a new user has no rights to anything
+
+common usages include:
+	users
+	groups
+	roles
+	iam access policies
+	api keys
+	specifying a password policy (i.e. - mfa)
+
+best practice to log in as an admin user or some other user and not use the root account
+
+practice the principle of least privilege - permissions should be as limited as possible
+
+best practice:
+	delete your root access keys
+	activate mfa on root account
+	create individual iam users
+	user groups to assign permissions
+	apply an iam password policy
+
+
+------------------
+
+policies
+
+	document that formally states one or more permissions
+
+	by default, an explicit deny always overrides an explicit allow (following the principle of least privilege)
+
+	iam provides pre-built policy templates to assign users and groups, exps include:
+		admin access - full access to all aws resources
+		power user access - admin access except user/group mgmt
+		read only access - only view aws resources (i.e. user can only view what is in an s3 bucket)
+
+	you can create custom permissions with the policy generator or written from scratch
+
+	more than one policy can be attached to a user or group at the same time
+
+	policies cannot be directly attached to aws resources (such as an EC2 instance)
+
+
+-------------------
+
+roles
+	think about an ec2 instance that needs to access s3. you need to use a role here. you can assign a role to an instance after creation as well via the cli or management console
+
+	ec2 instance can only have 1 role attached
+
+	other users can use roles to get temporary access
+
+
+---------------------
+sts (security token services)
+
+	allows you to create temporary security credentials that grant trusted uesrs access to your aws resources
+
+	short term use only and can be active for a few mins to several hours
+
+	once expired, they cannot be used again
+
+	when requested through an sts api call, credentials are returned in 3 components:
+		security token
+		access key id
+		secret access key
+
+
+--------------------
+iam api keys
+
+	used for cli access, basically
+
+	api keys are only avaialable one time, when a new user is created or when you reissue a new set of keys
+
+	aws will NOT regenerate the same set of keys
+
+	in order for api credentials to work, they must be associated with a user
+
+
+
+
+
+
+
