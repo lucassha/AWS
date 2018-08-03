@@ -1,0 +1,250 @@
+ec2-ebs-official-guide
+
+two concepts that are key to launching instances on AWS:
+	the amount of virtual hardware dedicated to the instance
+
+	the software loaded on the instance
+
+
+instance type families:
+	c4 - compute optimized - for workloads requiring significant processing
+
+	r3 - memory optimized - for memory-intensive workloads
+
+	i2 - storage optimized - for workloads requirigin high amounts of fast SSD storage
+
+	g2 - gpu-based - intended for graphics and general purpose GPU compute workloads
+
+
+enhanced networking - reduces the impact of virtualization (sr-iov). this results in more packets per second, lower latency, and less jitter
+
+	enhanced networking is available only for instances launched in the a VPC
+
+
+AMIs
+
+	defines the initial software that will be on the instance, including:
+		OS and its configuration
+		initial state of any patches
+		application or system software
+
+		all AMIs are based on x86 OSs, either Linux of Windows
+
+	four sources of AMIs:
+		published by aws
+		aws marketplace
+		generated from existing instances
+		uploaded virtual servers
+
+
+securely using an instance:
+	public dns name 
+		dns name generated automatically and cannot be specified. the dns name persists only while the instance is running and cannot be transferred
+
+	public ip
+		cannot be specified. persists only while the instance is running and cannot be transferred
+
+	elastic ip
+		unique ip address that you reserve independently and associate with an ec2 instance. it persists until the customer releases it and is not tied to the lifetime of an individual instance. it is a public address that can be shared externally w/o coupling clients
+
+
+initial access
+	public key and private key to create a key pair for log in over ssh
+
+	aws stores the public key and the private key is kept by the customer
+
+	when ec2 launches a linux instance, the private key is stored in ~/.ssh/authorized_keys file and an initial user is created. 
+
+
+virtual firewall protection
+	security groups allow you to control traffic based on port, protocol, and source/destination
+
+	every instance must have at least one security group
+
+	a security group is a default deny. that is, it does not allow any traffic that is not explicitly allowed by a security group rule.
+
+	a security group is a STATEFUL firewall; that is, an outgoing message is remembered so that the response is allowed through the security group without an explicit inbound rule being required
+
+
+
+instance lifecycle
+
+	bootstrapping
+		providing code to be run on an instance at launch is called bootstrapping.
+
+		script can perform tasks such as:
+			applying patches and updates to the OS
+			enrolling in a directory service
+			installing application software
+			copying a longer script or porgram from storage to be run on the instance
+			installing chef or puppet and assigning the instance a role so the configuration management software can configure the instance
+
+		userData is stored with the instance and is not encrypted, so it is important to not include any secrets such as passwords or keys in the userData
+
+
+	vm import/export
+
+		import virtual machines from your existing environment as an ec2 instance and export them back to your on-premises env. instances launched within aws from AMIs cannot be exported
+
+
+	instance metadata
+
+		data about your instance that you can use to configure or manage the running instance. it is a method to obtain aws properties without making a call to the api
+
+			make an http call to: 
+				http://169.254.169.254/latest/meta-data 
+
+				this will return the top node of the instance metadata tree. it includes:
+					associated security groups
+					instance id
+					instance type
+					ami used to launch the instance
+
+	
+	managing instances
+		use tags for a key/value pair so you can associate with your instance or other services
+
+
+	monitoring instances
+		use cloudwatch
+
+
+	modifying an instance
+
+		instance type
+			set the instance state to 'stopped' choose the 'change instance type' function in the tool of choice (api, console, sdk) and select the desired instance. restart the instance and your process is complete
+
+		security groups
+			you can change these while the instance is running. for instances outside of a vpc, the security groups cannot be changed
+
+		termination protection
+			enable termination protection. this does not prevent termination triggered by an OS shutdown command, termination from auto scaling, or termination of a spot instance due to spot price changes
+
+
+pricing options
+
+	on-demand instances
+		requires no up-front commitment, and the customer has control when the instance is launched and terminated
+
+		it is the least cost effective but provides the most flexibility
+
+	reserved instances
+		specify the instance type and AZ. enablces customers to make capacity reservations for predictable workloads
+
+		additional benefit is that capacity in the aws data centers is reserver for the customer. 
+
+		two factors that determine the cost of reservation:
+			term commitment
+			payment option
+
+
+		payment options:
+			all upfront
+			partial upfront
+			no upfront
+
+	
+	spot instances
+		for workloads that are not critical and tolerant to interruption. customers specify the price they want to pay for a certain instance type. instances will run until:
+
+			customer terminates them
+			spot price goes above the customer's bid price
+			there is not enough unused capacity to meet the demand for spot instances
+
+
+tenancy
+
+	shared tenancy
+		default model for all instances. it means that a single host machine may house instances from different customers. as aws does not use overprovisioning and fully isolates instances from other instances, this is a secure tenancy model
+
+	dedicated instances 
+		hw dedicated to a single customer
+
+	dedicated host
+		a physical server with ec2 instance capacity fully dedicated to a single customer's use. this differs from dedicated instances in that a dedicated instance can launch on any hw that has been dedicated to the account
+
+	placement groups
+		logical grouping of instances within one AZ. it enables applications to participate in a low-latency, 10 gbps network. to fully use this network performance for a placement group, choose an instance type that supports enhanced networking and 10gbps network performance
+
+
+instance stores
+
+	ephemeral storage. it provides temporary block storage for the instance. the storage is located on disks that are physically attached to the host computer
+
+	they key aspect of instance stores is that they are temporary. data in the instance store is lost when:
+		underlying disk drive fails
+		the instance stops (data will persist if an instance reboots)
+		the instance terminates
+
+
+elastic block storage
+
+	each ebs volume is automatically replicated within its AZs to protect from component failure, offering high avai and durability
+
+	a volume can be attached to a single instance at a time
+
+
+	volume types
+		magnetic
+			lowest performance characteristics but also the cheapest
+
+			best suited for:
+				workloads where data is accessed infrequently
+				sequential reads
+				situations where low-cost storage is a requirement
+
+			volumes are billed based on the amount of data space provisioned, regardless of how much data you actually storage on the volume
+
+
+		general purpose ssd
+			deliver strong performance at moderate price point
+
+			billed based on the amount of data space provisioned, regardless of how much volume used.
+
+			best suited for:
+				system boot volumes
+				small to medium sized DBs
+				development and test environments
+
+
+		provisioned IOPS SSD
+			highest performance and most expensive
+
+			best suited for:
+				critical business applications that require sustained iops performance
+				large DB workloads
+
+		there are two new HHD volume types that should be in linux academy videos. look for the info there.
+
+
+	protecting data
+
+		backup/recovery (snapshots)
+			take point-in-time snapshots. snapshots are incremental backups, which means that only the blocks on the device that have changed since your most recent snapshots are saved
+
+			how to take a snapshot:
+				aws console
+				cli
+				api
+				setting up a schedule to take snapshots
+
+			data is stored in s3. snapshot is free. just pay for the storage.
+
+			they are stored in aws controlled storage and not in yoru account's s3 buckets. you cannot manipulate them like other s3 objects. rather, you must use the ebs snapshot features to manage them.
+
+			snapshots are constrained to the region in which they are created, meaning you can use them to create new volumes only in the same region. if you need to restore a snapshot to a diff region, you can copy a snapshot to another region
+
+			snapshots can also be used to increase volume size. take a snapshot of the volume, then create a new volume with the desired size from the snapshot. replace the original volume with the new volume
+
+			encryption
+				native encryption on all volume types
+
+				amazon uses aws kms (key mgmt services) to handle key management. 
+
+
+
+
+
+
+
+

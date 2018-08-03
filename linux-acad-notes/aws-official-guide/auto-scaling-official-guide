@@ -1,0 +1,56 @@
+auto-scaling-official-guide
+
+auto scaling is a service that allows you to scale your ec2 capacity automatically by scaling out and scaling in according to your criteria that you define
+
+
+auto scaling plans
+	maintain current instance levels
+		configure to maintain a minimum or specified number of running instances at all times. auto scaling performs periodic health check on running instances within an auto scaling group. when it finds an unhealthy instance it terminates that instance an launches a new one
+
+
+	manual scaling
+		specify the max, min, or desired capacity for your auto scaling group. a.s. manages the process of creating or terminating instances to maintain the updated capacity
+
+
+	scheduled scaling
+		if you knwo exactly when you will need to increase or decrease the number of instances
+
+		recurring events such as end-of-month, quarter, or year processing or scheduled and recurring automated laod and performance testing can be ramped up appropriately at the time of a scheduled event
+
+
+	dynamic scaling
+		define the parameters that control the a.s. process in a scaling policy
+
+
+a.s. components
+	launch config, a.s. gorup, and optional scaling policy
+
+
+	launch config
+		the template that a.s. uses to create new instances and it is composed of hte configuration name, ami, ec2 instance type, security group and instance key pair
+
+		each a.s. group can have only one launch configuration at a time
+
+
+	a.s. group
+		an a.s. group can use either on-demand or spot instances as the ec2 instances it manages
+
+
+	scaling policy
+		adjust a.s. dynamically
+
+		when a threshold is crossed, cloudwatch sends alarms to trigger changes (scaling in or out) to the number of ec2 instances currently receiving traffic behind a load balancer
+
+		several ways to configure a scaling policy
+			increase or decrease by a specific number of instance
+
+			target a specific number of instnaces
+
+			adjust based on a percentage
+
+
+		best practice: scale out quickly and scale in slowly
+
+		a.s. supports a cool down period, which is a configurable setting that determines when to suspend scaling activities for a short time for an a.s. group
+
+		

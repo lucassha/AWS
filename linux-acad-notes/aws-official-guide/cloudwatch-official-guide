@@ -1,0 +1,15 @@
+cloudwatch-official-guide
+
+monitor your aws resources in real time
+
+basic monitoring sends data points to cloudwatch every 5 minutes for a limited number of preselected metrics at no charge
+
+detailed monitoring sends data points to cloudwatch every minutes and allows data aggreation for an additional charge
+
+cloudwatch metrics can be retrieved performing a get request. 
+
+cloudwatch logs agent is available that provides an automated way to send log data to cloudwatch logs for ec2 instances running amazon linux or ubuntu
+
+metrics data is reatined for two weeks by default
+
+need to move logs to persistent storage like s3 or glacier if you want to keep them longer. 

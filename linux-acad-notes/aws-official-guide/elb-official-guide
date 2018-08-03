@@ -1,0 +1,130 @@
+elb-official-guide
+
+
+elastic load balancing
+	load balancer automatically distributes traffic across multiple ec2 instances
+
+	allows you to distribute traffic across a group of ec2 instances in one or more AZs, enabling high availability
+
+	supports HTTP, HTTPS, TCP, SSL traffic
+
+	provides a stable, single canonical name record (CNAME) entry point for DNS configuration and supports both internet-facing and internal application-facing load balances
+
+	supports health checks for ec2 isntances to ensure traffic is not routed to unhealthy or failing instances
+
+	elb can automatically scale
+
+	integrates w/ auto scaling to automatically scale the ec2 instances behind the load balancer
+
+	secure, working with vpc to route traffic intnerally between application tiers, allowing you to expose only internet-facing public ip addresses
+
+	supports integrated certificate management and ssl termination
+
+	ELB itself ia a highly available service and can be used to help build highly available architectures
+
+
+internet facing load balancers
+	takes requests from clients over the internet and distributes them to ec2 instances that are registered with the load balancer
+
+	when configuring, it recives a public DNS name that clients can use to send requests to your app. the DNS servers resolve the dns name to your load balancer's public ip addy
+
+	an aws recommended best practice is always to reference a load balancer by its dns name, instead of by the ip address of the load balancer, in order to provide a single, stable entry point
+
+	supports ipv4 addresses only
+
+
+internal load balancers
+	use these to route traffic to your ec2 instances in vpcs with private subnets 
+
+
+https load balancers
+	must install an SSL certificate on the load balancer that it uses to terminate the connection and then decrypt requests from clients before sending requests to the back-end ec2 instances
+
+	load balancing does not support SNI (server name identification) on your load balancer. would need to add SAN (subject alternative name) if you want to host multiple websites on a fleet of ec2 instances
+
+
+listeners
+	every load balancer must have one or more listeners configured
+
+	a listener is a process that checks for connection requests - for exp, a CNAME configured to the A record name of the load balancer. 
+
+	every listener is configured with a protocol and a port (client to load balancer) for a front-end connection and a protocol and port for a back-end (load balancer to ec2 instance) connection
+
+	elb supports the following protocols (again)
+		http
+		https
+		tcp
+		ssl
+
+	supports protocols operating at two different OSI (open system interconnection) layers
+
+	layer4 = tcp
+	layer7 = http/https
+
+
+configuring elastic load balancing
+	
+	idle connection timeout
+		load balancer maintains two connections - one connection is w the client and the other is the back-end to the ec2 instance
+
+		for each connection, there is an idle timeout that's triggered if no data is sent and the load balancer closes the connection
+
+		default idle timeout is 60 seconds for both connections
+
+		if using http/https, it's suggested to enable keep-alive option. this allows the load balancer to reuse connections to your back-end instance which reduces cpu utilization
+
+		to ensure the load balancer is responsible for closing the connections to your back-end instance, make sure that the value you set for the keep-alive time is greater than the idle timeout setting on your load balancer
+
+
+	cross zone load balancing
+		ensure request traffic is routed evenly across distributions
+
+
+	connection draining
+		enable connection draining to ensure that the load balancer stops sending requests to instances that are deregistering or unhealthy, while keeping the existing connections open
+
+		can specify a maximum time for the load balancer to keep connections alive before reporting the instance as dregistered
+
+
+	proxy protocol
+		human-readable header is added to the request header with the connection information such as the source ip, destination ip, and port numbers. the header is then sent to the back end isntance as part of the request
+
+		before using proxy protocol, ensure the load balancer is not behind a proxy protocol as it will then send two headers and potentially result in errors
+
+
+	sticky sessions
+		by default, a load balancer routes each request independently to the registered instance with the smallest load
+
+		with the sticky session feature, you can use the load balancer to bind a user's session to a specific instance. this ensures that all requests from the user during the session are sent to the same instance
+
+		if your application has its own session cookie, you can configure load balancing so that the session cookie follows the duration specified by the application's session cookie
+
+		elb creates a cookie named AWSELB that is used to map the session to the instance
+
+
+	health checks
+		status of healthy instances = InService
+		unhealthy = OutOfService
+
+		load balancer performs health checks on all registered instances to deteremine whether the instance is in a healthy state or an unhealthy state
+
+		it's a ping or a page that is checked periodically
+
+		you can set a threshold for the number of consecutive health check failures before an instance is marked as unhealthy 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

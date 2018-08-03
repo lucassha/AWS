@@ -1,0 +1,261 @@
+vpc-official-guide
+
+vpc is a custom-defined virtual network within the aws cloud. it lets you provision your own isolated section of aws.
+
+aws accounts that support ec2-vpc will have a default vpc created in each region with a default subnet created in each az. the assigned cidr block of the vpc will be 172.31.0.0/16
+
+vpc consts of the following components
+	subnets
+	route tables
+	dynamic host configuration protocol (dhcp) option sets
+	security groups
+	network access control lists (NACLs)
+
+
+in addition, is has the following optional components
+	IGWs
+	EIP addresses
+	elastic network interfaces
+	endpoints
+	peering
+	network address translation (NATs) instances and NAT gateways
+	virtual private gateway, customer gateways, and vpns
+
+
+subnet
+	segment of a VPC's IP address range when you can launch ec2 instances, rds dbs, and other aws resources
+
+	smallest subnet you can create is /28, which is 16 IP addresses
+
+	largest is /16, which is 2^16 addresses
+
+	aws reserves the first four ip addresses and the last ip address of every subnet for internal networking
+
+	subnets reside within one AZ and cannot span zones
+
+	one subnet = one AZ
+
+	however, there can be multiple subnets within the same AZ
+
+	they can be classified as public, private, or vpn only
+
+	the internal IP address range of the subnet is always private (that is, non-routable on the internet)
+
+
+route tables
+	contains a set of rules (called routes) that are applied to the subnet and used to determine where network traffic is directed
+
+	route table is what allows various ec2 instances within different subnets to communicate
+
+	use route tables to specify which subnets are public (by directing internet traffic to the igw) and which subnets are private (not having a route that directs traffic to the igw)
+
+	each route table contains a default route called the local route, which enables communication within the vpc, and this route cannot be modified or removed
+
+	important points
+		your vpc has an implicit router
+
+		vpc automatically comes with a main route table that you can modify
+
+		you can create additional custom route tables for your vpc
+
+		each subnet must be associated with a route table, which controls the routing for the subnet. if you don't explicitly associate a subnet with a particular route table, the subnet uses the main route table
+
+		you can replace the main route table with a custom table that you've created so that each new subnet is automatically associated with it
+
+		each route in a table specifies a destination CIDR and a target; 
+
+
+internet gateways
+	horizontally scaled, redundant, and highly available that allows communication between your vpc and the internet
+
+	ec2 instances are only aware of their private ip addresses, so when an instance receuives traffic from the internet, the igw translates the destination ip address (public ip address) to the instance's private ip addr and forwards the traffic to the vpc.
+
+	do the following to create a public subnet with internet access
+		attach an igw to your vpc
+		create a subnet route table rule to send all non-local traffic to the igw
+		configure your network ACLs and security group rules to allow relevant traffic to flow to and from your instance
+
+	do the following to enable an ec2 instance to send and receive traffic from the internet
+		assign a public ip address or eip address
+
+
+dynamic host configuration protocol (DHCP)
+	provides a standard for passing configuration information to hosts on a TCP/IP network. 
+
+	to assign your domain name to your instances, create a custom dhcp option set and assign it your amazon vpc. 
+
+	you can configure the following values within a dhcp option set:
+		domain-name-servers
+			the ip addresses of up to four domain name servers, separated by commas. the default is amazonProvidedDNS
+
+		domain-name
+			specify the desired domain name here
+
+		ntp-servers
+			the ip addresses of up to four network time protocol (NTP) servers, separated by commas
+
+
+	every amazon vpc must have only one dhcp option set assigned to it
+
+
+elastic ip addresses
+	aws maintains a pool of public ip addresses in each region and makes them available to you to associated to resources within a vpc
+
+	a static, public IP address in the pool for the region that you can allocate to your account (pull from the pool) and release (return to the pool)
+
+	eips allow you to maintain a set of ip addresses that remain fixed while the underlying infrastructure may change
+
+	must know
+		you must first allocate an eip for use within a vpc and then assign it to an instance
+
+		eips are specific to a region
+
+		one-to-one relationship between network interfaces and eips
+
+		you can move eips from one instance to another, either in the same vpc or a different vpc within the same region
+
+		eips remain associated with your aws account until you explicitly delete them
+
+		there are charges for eips allocated to your account, even when they are not associated with a resource
+
+
+elastic network interfaces
+	available within a vpc and associated with a subnet
+
+	ENIs allow you to create a management network, use network and security appliances in your vpc, create dual-homed instances with workloads/roles or distinct subnets, or create a low-budget, high-availability solution
+
+
+endpoints
+	enables you to create a private connection between your amazon vpc and another aws service w/o reuiring access over the internet or through a NAT instance, vpn connection, or aws direct connect
+
+	you can create multiple endpoints for a single service, and you can use different route tables to enforce different access policies from different subnets to the same service
+
+
+peering
+	networking connection between two vpcs that enables instances in either vpc to communicate with each other as if they are on the same network
+
+	can create between your own vpcs or other aws accounts within a single region
+
+	peering is a one-to-one relationship. no transitive routing.
+
+	important points
+		you cannot create a peering connection between two vpcs that have matching or overlapping cidr blocks
+
+		you cannot create a peering connection between amazon vpcs in different regions
+
+		peering connections do not support transitive routing
+
+		cannot have more than one peering connection between the same two vpcs at the same time
+
+
+security groups
+	controls inbound and outbound network traffic to aws resources and ec2 instances
+
+	all ec2 instances must be launched into a security group
+
+	if not specified, instance will be launched into a default security group for the vpc
+
+	the default security group allows communication between all resources within the security group, allows all outbound traffic, and denies all other traffic
+
+	important to know
+
+		you can specify allow rules but not deny rules. this is an important difference between security groups and NACLs
+
+		you can specify rules for inbound but not outbound
+
+		by default, no inbound traffic is allowed until you add inbound rules to the security group
+
+		by default, new security groups have an outbound rule that allows all outbound traffic
+
+		security groups are stateful. this means that responses to allowed inbound traffic are allowed to flow outbound regardless of outbound rules
+
+		instances associated with the same security group can't talk to each other unless you add rules allowing it (with the exception being the default security group)
+
+		you can change security groups with which an instance is associated after launch, and the changes take effect immediately
+
+
+network access control lists (NACLs)
+	stateless firewall on a subnet level
+
+	numbered list of rules that aws evaluates in order with the lower number being the higher priority
+
+	initial configuration will deny all inbound and outbound traffic until you create rules that allow otherwise
+
+	every subnet must be associated with a nacl
+
+
+security group versus network acl
+
+security group
+	operates at the instance level
+
+	supports allow rules only
+
+	stateful: return traffic automatically allowed, regardless of any rules
+
+	applied selectively to individual instances
+
+nacl
+	operates at the subnet level
+
+	supports allow and deny rules
+
+	stateless: return traffic must be explictly allowed by rules
+
+	aws processes rules in number order when deciding whether to allow traffic
+
+	automatically applied to all instances in the associated subnets; this is a backup layer of defense, so you don't have to rely on domsone specifying the security group
+
+
+network address translation (NAT) instances and NAT gateways
+	by default, any instance launched in a private subnet in a vpc is not able to communicate with the internet through the internet gateway
+
+	aws provides NAT instances and gateways to allow instances deployed in private subnets to gain internet access
+
+	for common use cases, a nat gateway is recommended. it provides better availability and higher bandwidth, and requires less admin effort than nat instances
+
+
+NAT instance
+	linux AMI that is designed to accept traffic from instances within a private subnet, translate the source ip to a public ip, and forward the traffic to the IGW
+
+
+NAT gateway
+	amazon managed resource that is designed to operate just like a NAT instance but is simpler to manage and highly available within an AZ
+
+	to allow instances within a private subnet to access the internet through the igw via a NAT gateway, do the following
+
+		configure the route table associated with the private subnet to direct internet-bound traffic to the NAT gateway
+
+		allocate an EIP and associate it with the NAT gateway
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

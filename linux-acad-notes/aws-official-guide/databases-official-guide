@@ -1,0 +1,340 @@
+databases-official-guide
+
+rds - relational database services
+
+oltp
+	online transaction processing
+	frequently writing and changing data
+
+olap
+	online analytical processing
+	domain of data warehouses and refers to reporting or analyzing large data sets
+
+
+rds provides support for 6 diff rdms
+	mysql
+	oracle
+	postgres
+	microsoft sql serv
+	mariadb
+	amazon aurora
+
+
+data warehouse
+	central repo for data that can come from multiple sources
+
+	often a specialized type of relational db that can be used for reporting and analysis via olap
+
+amazon redshift is a high-performance data warehouse designed specifically for olap use cases. it is also common to combine rds and redshift in the same application and periodically extract recent transactions and load them into a reporting db
+
+
+nosql
+	simpler to use, more flexible, and can achieve performance levels that are difficult or impossible with other relational dbs
+
+	nosql architecture scales horizontally on commodity hardware
+
+	nosql dbs have key/value stores or document stores w flexible schemas that can evolve over time, compared to rdms with very rigid structure
+
+	can run any type of nosql db on aws using ec2 or choose a managed service like dynamoDB to deal with the heavy lifting involved w building a distributed cluster spanning multiple data centers
+
+
+amazon rds
+	service itself provides an api that lets you create and manage one or more db instances
+
+	a db instance is an isolated db environment deployed in your private network segments in the cloud
+
+	a db instance can contain multiple diff dbs, all of which you create and manage within the db instance itself by executing sql commands with the rds endpoint
+
+	compute and memory resources of a db instance are determined by its db instance class. 
+
+	rds will migrate your data to a larger or smaller instance class
+
+	many features and common config settings are exposed and managed using db param groups and db option groups. 
+
+	a db parameter group acts as a container for engine config values applied to one or more db instances. you may change the db parameter for an existing db instance but a reboot is required
+
+	a db option group acts as a container for engine features which is empty by default
+
+	in order to enable specific features of a db engine, you create a new db option group and configure the settings accordingly
+
+
+migration to rds
+	existing dbs can be migrated to rds using native tools and techniques that vary depending on the engine
+
+	aws db migration service also helps convert dbs form one db engine to another
+
+
+operational benefits
+	with rds, you cannot use ssh to log in to the host instance and install a customer piece of sw
+
+	however, you can connect using sql admin tools or use db option groups and db parameter groups to change the behavior or feature config of a db instance
+
+	rds is designed to simplify the common tasks required to operate a relational db in a reliable manner. it's useful to compare the responsibilties of an admin when operating a relation db in your data center or with rds
+
+
+mysql
+	running innodb as default
+
+	allows you to connect to standard mysql bench tools
+
+	supports multi-az deployments for high availability and read replicas for horizontal scaling
+
+
+postgreSQL
+	supports multi-az deployment and read replicas
+
+
+mariaDB
+	supports multi-az deployment and read replicas
+
+
+aurora
+	redesigned components of mysql to take a more service-oreinted approach
+
+	fully managed service, mysql compatible, and provides increased reliability and performance of mysql w/o requiring changes to most existing webapps
+
+	create a db cluster. a db cluster has one or more instances and inlucdes a cluster volume that manages the data for those instances
+
+	aurora cluster volumie is a virtual db storage volumes that spans multiple azs, with each az having a copy of the cluster data. 
+
+	aurora db cluster consists of two types of instances
+		primary instance
+			main instance, which supports both read and write workloads. when you modify data, you are modifying the primary instance. each cluster has one primary instance
+
+		aurora replica
+			secondary instance that supports read only operations. each db cluster can have up to 15 replicas. by using replicas, you redistribute the read workload among various instances, increasing performance. you can also locate replicas in multiple azs to increase db availability
+
+
+storage options
+	rds is built using ebs and allows you to select the right storage option based on your performance and cost requirements
+
+	supports 3 storage types
+
+		magnetic
+			standard storage. offers cost effective storage that is ideal for apps with light i/o requirements
+
+		general purpose (ssd)
+			also called gp2. can provide faster access than magnetic. this storage type can provide burst performance to meet spikes and is excellent for small to medium dbs
+
+		provisioned iops (ssd)
+			designed to meet the needs of i/o intensive workloads, particularly db worklaods that are sensitive to storage performance and consistency in random access i/o throughput
+
+
+backup and recovery
+	provides two mechanisms for backing up the db
+		automated backups and manual snapshots
+
+		by using a combo, you can design a backup recovery model to protect application data
+
+
+	rto and rpo
+
+	automated backups
+		rds feature that continuously tracks changes and backs up the db
+
+		creates a storage volume snapshot of your db instance, backing up the entire db instance and not just the individual dbs
+
+		can set the retention period when you create a db instance
+
+
+automated backup
+	one day of backups retained by default
+
+	takes a snapshot of the entire instance. not a single db
+
+	can modify the retention period up to a maximum of 35 days
+
+	if you delete a db instance, all snapshots are deleted UNLESS it was a manual snapshot
+
+	backups occur daily during a configurable 30 min maintenace window
+
+	backup retention period
+		automated backups kept for a configurable number of days
+
+
+manual db snapshots
+	can be made at anytime. will not be deleted when an instance is deleted
+
+
+recovery
+	you cannot restore from a db snapshot to an existing db instance
+
+	a new db instance is created when you restore an instance
+
+	when a db instance is restored, only the default db parameters and security groups are associated with the restored instance
+
+
+high availability with multi AZ
+	create a db cluster across multiple AZs
+
+	uses replication by using synchronous replication to minimize RPO and fast failover to minimize RTO to minutes
+
+	allows you to place a secondary copy of your db in another az for disaster recovery purposes. multi-az deployments are available for all types of rds db engines
+
+	rds automatically performs a failover in the event of any of the following:
+		loss of avai in primary az
+		loss of network connectivity to primary db
+		compute unit failure on primary db
+		storage failure on primary db
+
+
+	multi az deployment is for disaster recovery only. it does not increase performance. a standby db instance is not available to offline queries from the primary master db instance. to improve performance, you use read replicas or other caching technologies
+
+
+scaling up and out
+	
+	vertical scalability
+		scale up or down your database tier to meet demands needed, such as additional compute, memory, or storage resources
+
+		select a diff db instance class and rds automates the migration
+
+		can also increase the storage from 5gb to 6tb
+
+
+	horizontal scalability with partitioning
+		partition a large db into multiple instances or shards to handle more requests beyond the capabilities of a single instance
+
+		sharding allows you to horizontally scale to handle more users and requests but requires additional logic in the application layer. the application decides how to route db requests to the correct shard and becomes limited in the types of queries that can be performed
+
+		nosql dbs like dynamoDB or cassandra are designed to scale horizontally
+
+
+	horizontal scalability with read replicas
+		offload read transactions from the primary db and increase the overall number of transactions
+
+		read replicas allow you to scale out elastically beyond the capacity constraints of a single db instance for read-heavy db workloads
+
+		use cases:
+			scale beyond the capacity of a single db instance for read-heavy
+
+			handle read traffic while the source db instance is unavai (for exp, maintenance, or scheduled backups)
+
+			offload reporting or data warehousing scenarios against a replica instead of the primary db instance
+
+		updates made to the source db are asynchronously copied to the read repliace. you can reduce the load on your source db instance by routing read queries from your app to the read replica
+
+		read replicas can be in many regions as well. this can enhance disaster recovery and serve read traffic closer to global customers
+
+
+redshift
+	fast
+	powerful
+	fully managed petabyte scale data warehouse service
+
+	relational db designed for OLAP scenarios adn optimized for high performance analysis and reporting of very large datasets
+
+	redshift manages the work needed to set up, operate, and scale a data warehouse from provisioning the infra capacity to automating ongoing admin tasks such as backups and patching
+
+	it automatically monitors your nodes and drives to help you recover from failure
+
+
+clusters and nodes
+	
+	cluster
+		key component of a redshift data warehouse
+
+		a cluster is composed of a leader node and one or more compute nodes
+
+		the client application interacts directly with the leader node and the compute nodes are transparent to external applications
+
+		each cluster contains one or more dbs. your application does not interact directly with the compute nodes.
+
+		performance can be increased by adding additional compute nodes
+
+		when submitting a query, redshift distributes and executes the query in parallel across all of the cluster's compute nodes 
+
+		it also spreads table data across all the compute nodes in a cluster based on a distribution strategy specified
+
+		when you perform a cluster resize operation, redshift will create a new cluster and migrate data from the old cluster to the new one. the db will be read only until that is completed
+
+
+	table design
+		CREATE TABLE essentially, just like a normal db
+
+
+	compression encoding
+		performance optimization in redshift through data compression
+
+		when loading data into a table, redshift samples the data and selects the best compression scheme for each col
+
+
+	distribution strategy
+		impacts the query performance, storage reqs, data loading, and maintenance
+
+		three styles: even, key, all
+
+		EVEN
+			default option and results in the data being distributed across the slices in a uniform fashion regardless of data
+
+		KEY
+			rows are distributed according to the values in one column. the leader node will store matching values close together and increase query performance for joins
+
+		ALL
+			a full copy of the entire table is distributed to every node. this is useful for lookup tables and other large tables that are not updated frequently
+
+	
+	sort keys
+		specify one or more cols as sort keys. it enables efficient handling of range-restricted predicates. 
+
+		you can rapidly skip over large numbers of blocks during the scans, if you enable this 
+
+
+	loading data
+		INSERT, UPDATE
+
+		for bulk, redshift uses COPY command as an efficient alternative to INSERT
+
+		data can be exported out of redshift using UNLOAD. it can be used to generate delimited text files and store them in s3
+
+
+	querying data
+		SELECT
+
+		for complex queries, analyze the query plan and monitor the performance using cloudwatch and the redshift web console
+
+		workload management (wlm)
+			allows you to define multiple queues and set the concurrency level for each queue
+
+
+	snapshots
+		can create point in time snapshots just like rds
+
+		can be used to restore a copy or create a clone
+
+		stored internally in s3
+
+		manual or automated snapshots
+
+		manual will be retained until explicitly deleted
+
+
+	security
+		should be in infrastrcture, in your db instance, and encrypting files/data sent
+
+
+dynamoDB
+	fully managed noSQL db service to provide fast and low latency performance with easy scaling
+
+	designed to simplify db and cluster mgmt
+
+	can create a table in dynamodb and write an unlimited number of items w consistent latency 
+
+	can provide consitent performance levels by automatically distributing the data and traffic for a table over multiple partitions
+
+	dynamodb will automatically add enough infrastructure capacity to support the requested throughput levels
+
+	all table data stored on ssds for fast performance
+
+	provides high avai and durability protections by replicating data across multiple AZs within a region
+
+
+	with dynamo db, you have a table and inside primary keys with attributes. it's essentially like a dictionary. 
+
+	a primary key uniquely identifies the item
+
+	each attribute is a name/value pair
+
+	it can be a single-valued or multi-valued set. for exmp, a book can have multiple authors
+
+need to write up the rest on dynamodb. just don't really feel like it atm.
+

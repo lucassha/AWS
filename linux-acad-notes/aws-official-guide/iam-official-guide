@@ -1,0 +1,213 @@
+iam-official-guide
+
+iam IS NOT:
+	an identity store/authorization systems for your applications. the permissions you assign are to manipulate aws infrastructure, not permissions within your application
+
+	an operation system identity management. you are in control of your operating system console and configuration
+
+
+use case:
+	
+	os access
+		active directory ldap machine-specific accounts
+
+	application access
+		active directory
+		application user repositories
+		amazon cognito
+
+	aws resources
+		iam
+
+
+
+principals
+	an IAM entity that is allowed to interact with aws resources
+	it can be permanent or temporary
+	it can be an application or a human
+	three types
+		root user
+		iam user
+		roles/temporary security tokens
+
+
+	root user
+		can be used for both console and programmatic access to aws resources
+		do not use the root user for everyday tasks
+
+
+	iam users
+		represent individuals or applications. they are persistent
+
+		can be created by principals with iam admin privileges at any time through the console, cli, or sdk. 
+
+		no expiration period for users. they are permanent entities until an iam admin takes an action to delete them
+
+		you should execture the principle of least privilege with all users
+
+
+	roles/temporary security tokens
+		roles are used to grant specific privileges to specific actors for a duration of time
+
+		when one of these actors assumes a role, aws provides the actor with a temporary security token from the aws security token services (STS) that the actor can use to access aws cloud services
+
+		security token ranges from 15 minutes to 36 hours
+
+		roles and temporary security tokens enable a number of use cases
+			ec2 roles- granting permissions to applications running on an ec2 instance
+
+			cross-account access- granting permissions to users from other aws accounts, whether you control these accounts or not
+
+			federation- granting permissions to users authenticated by a trusted external system
+
+
+		ec2 roles
+			using iam roles for ec2 removes the need to store aws credentials in a configuration file
+
+
+	aws principal traits
+		root
+			cannot be limited
+			permanent
+
+		iam
+			access controlled by policy
+			durable
+			can be removed by iam admin
+
+		role
+			access controlled by policy Temporary Expire after specific time interval
+
+
+	authentication
+		3 ways that iam authenticates a principal
+
+		username/pw
+
+		access key
+			access key id and secret access key id
+
+			when manipulating infrastructure via api, it will use these values to sign the underlying REST calls to the services
+
+		access key/session token
+			process operates under an assumed role and the temp sec token provides an access key
+
+			the token includes a session token. calls to aws must include both
+
+
+	when an iam user is created, it has neither an access key nor a pw and the iam admin can set up either or both
+
+
+	authorization
+		process of specifying what actions a principal can and cannot perform
+
+		handled by defining specific privileges in policies and associating those policies with principals
+
+
+	policies
+		json document that fully defines a set of permissions to access and manipulate aws resources
+
+		policy doc contains one or more permissions with each permission defining-
+			effect: allow or deny
+
+			service: what service does the permission apply to
+
+			resource: specific aws infrastructure. this is specified as an amazon resource name (arn)
+
+			arn format example to access the s3 bucket:
+			arn:aws:s3:us-east-1:123456789012:my_corporate_bucket/*
+
+			arn:aws:iam:us-east-1:123456789012:user/David
+
+			format:
+				"arn:aws:service:region:account-id:[resourcetype:]resource"
+
+
+			action
+				specifies the subset of actions within a service that the permission allows or denies
+
+			condition
+				optionally defines one or more additional restrictions that limit the actions allowed by the permission
+
+
+	associating policies with principals
+		policy can be associated directly with an iam user in two ways
+
+
+		user policy
+			exist only in the context of the user to which they are attached. in the console, a user policy is entered into the user interface on the iam user page
+
+
+		managed policies
+			exist independently of any individual user
+
+			this way the same policy can be associated with many users or groups of users
+
+			large number of predefined managed policies
+
+			using predefined managed policies ensures that when new permissions are added for new features, your users will still have the correct access
+
+
+	iam groups feature
+		assign a policy to a group and then add users to this group
+
+		any member of the group assumes those permissions assigned to the group
+
+
+	a good first step is to use the root user to create a new iam group called 'iam admins' and assign the managed policy 'iamfullaccess.' then create a new iam user called admin and assign a pw then add it to the group. at this point, you can log out of root and use the admin users for all further tasks with this account
+
+
+	multifactor authentication
+		verify your identity with both something you KNOW and HAVE
+
+		can be assigned to any iam user account
+
+		strongly recommended mfa is added to the root user
+
+
+	rotating keys
+		rotate access keys assosciated with iam users
+
+		process to rotate keys can be conducted in any of the big 3
+
+		process:
+			create a new access key for the user
+
+			reconfigure all applications to use the new access key
+
+			disable the original access key
+
+			verify the operation of all apps
+
+			delete the og access key
+
+
+
+summary
+	
+	policies define what actions can and cannot be taken
+
+	policies are associated with iam users either directly or through group membership
+
+	a temporary security token is associated with a policy by assuming an iam role. you can write your own policies or use the managed policies provided 
+
+	know how to resolve conflicting permissions
+		if an action on a resource has not been explicitly allowed or denied, it will be denied by default. if only policy allows and another denies, it is denied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
